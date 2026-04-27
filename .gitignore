@@ -1,0 +1,27 @@
+# ============================================================================
+# WAG — Git Ignore
+# ============================================================================
+
+# Local environment secrets (never commit)
+.env
+
+# Node.js dependencies (installed inside container or via npm install)
+node_modules/
+src/node_modules/
+
+# Session data and logs (contain WhatsApp auth credentials)
+# Re-pairing will be required if this directory is lost.
+data/
+
+# macOS / OS X metadata
+.DS_Store
+
+# Editor artefacts
+*.swp
+*.swo
+*~
+.vscode/
+.idea/
+
+# Docker build cache (if any local experimentation)
+.docker/

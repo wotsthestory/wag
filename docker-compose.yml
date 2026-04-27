@@ -1,0 +1,116 @@
+# ============================================================================
+# Docker Compose — WAG (WhatsApp Ghost)
+# ============================================================================
+#
+# WhatsApp Web automation gateway built on Baileys, exposed through Traefik.
+#
+# Services:
+#   wag  — Node.js backend + Web GUI (self-built image)
+#
+# Networks:
+#   proxy  — External bridge shared with the Traefik stack at /opt/traefik
+#            Traefik discovers this container via Docker labels and routes
+#            traffic for wag.tsrv.uk to it.
+#
+# Volumes:
+#   ./data  — Persistent storage for WhatsApp session auth state and logs.
+#             DO NOT delete this directory unless you intend to re-pair.
+#
+# Usage:
+#   docker compose up -d        # Start in background
+#   docker compose logs -f      # Follow logs
+#   docker compose down         # Stop
+#   docker exec -it wag sh      # Interactive CLI access
+#
+# IMPORTANT: No `version:` key is declared. This file uses the Compose
+# Specification format (recommended since Docker Compose v1.27+).
+# ============================================================================
+
+services:
+  # -------------------------------------------------------------------------
+  # WAG Application Service
+  # -------------------------------------------------------------------------
+  wag:
+    # Build the image from the Dockerfile in this directory
+    build:
+      context: .
+      dockerfile: Dockerfile
+
+    container_name: wag
+    restart: unless-stopped
+
+    # Resource limits prevent a runaway Node process from starving the host
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+
+    # Environment variables — see .env.example for descriptions
+    environment:
+      - PORT=3000
+      - NODE_ENV=production
+      - SESSION_PATH=/app/data/session
+
+    # Persistent data mount
+    # Left side: host path relative to this compose file
+    # Right side: container path (must match SESSION_PATH and Dockerfile)
+    volumes:
+      - ./data:/app/data:rw
+
+    # Attach to the shared Traefik reverse-proxy network
+    networks:
+      - proxy
+
+    # -----------------------------------------------------------------------
+    # Traefik v3 Dynamic Labels
+    # -----------------------------------------------------------------------
+    # These labels are read by Traefik's Docker provider (configured in
+    # /opt/traefik/data/traefik.yml). They tell Traefik to route traffic
+    # for wag.tsrv.uk to this container on port 3000.
+    #
+    # Security chain: secured@file applies:
+    #   • CloudflareWarp (restore real client IPs)
+    #   • CrowdSec (threat detection & bouncer)
+    #   • Rate limiting (50 req/s average, 100 burst)
+    #   • Gzip compression
+    #   • Hardened security headers (HSTS, CSP, etc.)
+    #
+    # TLS: Automatic Let's Encrypt certificates via Cloudflare DNS-01.
+    # -----------------------------------------------------------------------
+    labels:
+      # Enable Traefik discovery for this container
+      - "traefik.enable=true"
+
+      # HTTP Router — catches plain HTTP and redirects to HTTPS
+      - "traefik.http.routers.wag-http.rule=Host(`${WAG_DOMAIN}`)"
+      - "traefik.http.routers.wag-http.entrypoints=web"
+      - "traefik.http.routers.wag-http.middlewares=wag-https-redirect"
+
+      # Redirect middleware: permanent 301 to HTTPS
+      - "traefik.http.middlewares.wag-https-redirect.redirectscheme.scheme=https"
+      - "traefik.http.middlewares.wag-https-redirect.redirectscheme.permanent=true"
+
+      # HTTPS Router — secure endpoint
+      - "traefik.http.routers.wag.rule=Host(`${WAG_DOMAIN}`)"
+      - "traefik.http.routers.wag.entrypoints=websecure"
+
+      # Apply the hardened middleware chain defined in Traefik's config.yml
+      - "traefik.http.routers.wag.middlewares=secured@file"
+
+      # TLS termination with Let's Encrypt
+      - "traefik.http.routers.wag.tls=true"
+      - "traefik.http.routers.wag.tls.certresolver=letsencrypt"
+
+      # Internal load-balancer target port (inside the container)
+      - "traefik.http.services.wag.loadbalancer.server.port=3000"
+
+# ---------------------------------------------------------------------------
+# Networks
+# ---------------------------------------------------------------------------
+networks:
+  # The `proxy` network is declared as external because it is created and
+  # managed by the Traefik stack in /opt/traefik/docker-compose.yml.
+  # All services that need reverse-proxy access join this network.
+  proxy:
+    name: proxy
+    external: true

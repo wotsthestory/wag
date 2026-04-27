@@ -1,0 +1,25 @@
+{
+  "name": "wag",
+  "version": "1.0.0",
+  "description": "WhatsApp Ghost (WAG) — Containerised WhatsApp Web automation service with Web GUI",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js"
+  },
+  "keywords": [
+    "whatsapp",
+    "baileys",
+    "web",
+    "api",
+    "docker"
+  ],
+  "author": "wotsthestory",
+  "license": "MIT",
+  "dependencies": {
+    "@whiskeysockets/baileys": "^6.7.8",
+    "express": "^4.21.0",
+    "qrcode": "^1.5.4",
+    "ws": "^8.18.0"
+  }
+}

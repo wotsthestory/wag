@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WAG — WhatsApp Ghost</title>
+  <link rel="stylesheet" href="/style.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>👻</text></svg>">
+</head>
+<body>
+  <div class="app">
+    <!-- Header -->
+    <header class="header">
+      <div class="brand">
+        <span class="logo">👻</span>
+        <h1>WAG <span class="sub">WhatsApp Ghost</span></h1>
+      </div>
+      <div class="status-pill" id="statusPill">
+        <span class="dot" id="statusDot"></span>
+        <span id="statusText">Loading…</span>
+      </div>
+    </header>
+
+    <main class="main">
+      <!-- Left Column: Controls -->
+      <section class="panel controls">
+        <h2>🔗 Connection</h2>
+        <div id="qrSection" class="qr-section hidden">
+          <p class="hint">Scan this QR code with WhatsApp on your phone:</p>
+          <p class="hint small">Settings → Linked Devices → Link a Device</p>
+          <img id="qrImage" alt="WhatsApp QR Code" />
+        </div>
+        <div id="userSection" class="user-section hidden">
+          <p><strong>Connected as:</strong> <span id="userId">—</span></p>
+          <p><strong>Name:</strong> <span id="userName">—</span></p>
+        </div>
+        <div id="disconnectedSection" class="disconnected-section">
+          <p class="hint">Waiting for WhatsApp connection…</p>
+        </div>
+        <div class="actions">
+          <button id="btnLogout" class="btn danger" disabled>Logout / Reset Session</button>
+          <button id="btnRefresh" class="btn secondary">Refresh Status</button>
+        </div>
+
+        <hr />
+
+        <h2>✉️ Send Message</h2>
+        <form id="sendForm" class="send-form">
+          <label>
+            To (number or JID)
+            <input type="text" id="sendTo" placeholder="447123456789" required />
+          </label>
+          <label>
+            Message
+            <textarea id="sendMessage" rows="3" placeholder="Hello from WAG 👻" required></textarea>
+          </label>
+          <button type="submit" class="btn primary" id="btnSend" disabled>Send</button>
+        </form>
+
+        <div id="sendResult" class="result"></div>
+      </section>
+
+      <!-- Right Column: Live Log -->
+      <section class="panel log-panel">
+        <h2>📡 Live Log</h2>
+        <div class="log-controls">
+          <button id="btnClear" class="btn small secondary">Clear</button>
+          <button id="btnReconnect" class="btn small secondary">Reconnect WS</button>
+        </div>
+        <div id="logContainer" class="log-container"></div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <p>WAG v1.0.0 · Built with <a href="https://github.com/WhiskeySockets/Baileys" target="_blank">Baileys</a> · <a href="/api/health" target="_blank">Health</a></p>
+    </footer>
+  </div>
+
+  <script src="/app.js"></script>
+</body>
+</html>

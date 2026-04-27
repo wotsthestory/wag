@@ -1,0 +1,297 @@
+/* ==========================================================================
+   WAG — WhatsApp Ghost Web GUI Stylesheet
+   ==========================================================================
+   A clean, dark-themed interface optimised for long-running dashboard use.
+   Uses CSS custom properties for easy theming.
+   ========================================================================== */
+
+:root {
+  --bg: #0f1115;
+  --surface: #181a20;
+  --surface-2: #21242b;
+  --border: #2a2e36;
+  --text: #e2e4e9;
+  --text-muted: #8b8f98;
+  --accent: #25d366;           /* WhatsApp green */
+  --accent-dim: #128c7e;
+  --danger: #ef4444;
+  --warn: #f59e0b;
+  --info: #3b82f6;
+  --radius: 10px;
+  --font: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  --mono: 'SF Mono', ui-monospace, monospace;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font);
+  height: 100%;
+}
+
+.app {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 16px;
+}
+
+/* Header */
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.logo { font-size: 28px; }
+
+.brand h1 {
+  margin: 0;
+  font-size: 1.35rem;
+  letter-spacing: -0.3px;
+}
+
+.sub {
+  color: var(--text-muted);
+  font-weight: 400;
+  font-size: 0.85em;
+}
+
+.status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  padding: 6px 14px;
+  border-radius: 999px;
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+.dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--text-muted);
+  transition: background 0.3s ease;
+}
+
+.dot.connected { background: var(--accent); box-shadow: 0 0 8px var(--accent); }
+.dot.connecting { background: var(--warn); animation: pulse 1.5s infinite; }
+.dot.error, .dot.closed { background: var(--danger); }
+.dot.pairing { background: var(--info); animation: pulse 1.2s infinite; }
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+/* Main Layout */
+.main {
+  display: grid;
+  grid-template-columns: 380px 1fr;
+  gap: 18px;
+  padding: 18px 0;
+  flex: 1;
+}
+
+@media (max-width: 860px) {
+  .main { grid-template-columns: 1fr; }
+}
+
+/* Panels */
+.panel {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 18px;
+}
+
+.panel h2 {
+  margin: 0 0 14px 0;
+  font-size: 1rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* QR & User Sections */
+.qr-section, .user-section, .disconnected-section {
+  text-align: center;
+  margin-bottom: 16px;
+}
+
+.qr-section img {
+  max-width: 260px;
+  width: 100%;
+  border-radius: var(--radius);
+  border: 2px solid var(--border);
+  background: #fff;
+  padding: 8px;
+}
+
+.hint {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  margin: 6px 0;
+}
+
+.hint.small { font-size: 0.8rem; }
+
+.hidden { display: none !important; }
+
+/* Buttons */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: filter 0.15s ease, transform 0.05s ease;
+  color: #fff;
+  background: var(--surface-2);
+}
+
+.btn:hover { filter: brightness(1.15); }
+.btn:active { transform: translateY(1px); }
+
+.btn.primary { background: var(--accent-dim); }
+.btn.danger { background: var(--danger); }
+.btn.secondary { background: var(--surface-2); border: 1px solid var(--border); }
+.btn.small { padding: 6px 10px; font-size: 0.8rem; }
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+/* Forms */
+.send-form label {
+  display: block;
+  margin-bottom: 12px;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+.send-form input,
+.send-form textarea {
+  width: 100%;
+  margin-top: 6px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font);
+  font-size: 0.95rem;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.send-form input:focus,
+.send-form textarea:focus {
+  border-color: var(--accent-dim);
+}
+
+.send-form textarea { resize: vertical; }
+
+.result {
+  margin-top: 10px;
+  font-size: 0.85rem;
+  min-height: 1.2em;
+}
+
+.result.success { color: var(--accent); }
+.result.error { color: var(--danger); }
+
+/* Log Panel */
+.log-controls {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.log-container {
+  height: 520px;
+  overflow-y: auto;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px;
+  font-family: var(--mono);
+  font-size: 0.82rem;
+  line-height: 1.45;
+}
+
+.log-entry {
+  padding: 4px 6px;
+  border-radius: 4px;
+  margin-bottom: 4px;
+  word-break: break-word;
+}
+
+.log-entry:nth-child(odd) { background: rgba(255,255,255,0.02); }
+
+.log-entry .ts { color: var(--text-muted); margin-right: 8px; }
+
+.log-entry .lvl {
+  display: inline-block;
+  width: 52px;
+  text-align: center;
+  border-radius: 3px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  padding: 1px 4px;
+  margin-right: 8px;
+}
+
+.lvl-info { background: rgba(59,130,246,0.15); color: #93c5fd; }
+.lvl-warn { background: rgba(245,158,11,0.15); color: #fcd34d; }
+.lvl-error { background: rgba(239,68,68,0.15); color: #fca5a5; }
+.lvl-msg_in { background: rgba(37,211,102,0.12); color: #86efac; }
+.lvl-msg_out { background: rgba(168,85,247,0.15); color: #d8b4fe; }
+
+/* Footer */
+.footer {
+  text-align: center;
+  padding: 16px 0;
+  border-top: 1px solid var(--border);
+  color: var(--text-muted);
+  font-size: 0.8rem;
+}
+
+.footer a { color: var(--text-muted); text-decoration: underline; }
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 8px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: #3a3f4a; }
