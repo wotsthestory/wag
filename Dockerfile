@@ -38,8 +38,8 @@ LABEL org.opencontainers.image.title="WAG — WhatsApp Ghost"
 LABEL org.opencontainers.image.description="Containerised WhatsApp Web automation with Web GUI"
 LABEL org.opencontainers.image.source="https://github.com/wotsthestory/wag"
 
-# Install curl for the HEALTHCHECK instruction
-RUN apk add --no-cache curl
+# Install curl for the HEALTHCHECK instruction and su-exec for privilege dropping
+RUN apk add --no-cache curl su-exec
 
 # Create a non-root user/group for security
 RUN addgroup -g 1001 -S nodejs && \
@@ -51,14 +51,14 @@ WORKDIR /app
 # Copy production node_modules from deps stage
 COPY --from=deps /deps/node_modules ./node_modules
 
-# Copy application source code (server.js + public/)
+# Copy application source code (server.js + public/ + entrypoint.sh)
 COPY --chown=wag:nodejs src/ ./
+
+# Make entrypoint executable
+RUN chmod +x /app/entrypoint.sh
 
 # Create data directory for session persistence and logs
 RUN mkdir -p /app/data/session /app/data/logs && chown -R wag:nodejs /app/data
-
-# Switch to non-root user
-USER wag
 
 # Expose the HTTP port defined in server.js (default 3000)
 EXPOSE 3000
@@ -67,6 +67,9 @@ EXPOSE 3000
 # Returns 200 from /api/health when the service is alive and responsive
 HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
   CMD curl -fs http://localhost:3000/api/health || exit 1
+
+# Entrypoint handles permission fixes before dropping to non-root user
+ENTRYPOINT ["/app/entrypoint.sh"]
 
 # Default command: start the Express server
 CMD ["node", "server.js"]
