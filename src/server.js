@@ -155,8 +155,18 @@ async function startWhatsApp() {
 
   sock = makeWASocket({
     version,
-    logger: undefined, // suppress default Pino logger in production
-    printQRInTerminal: true, // also prints QR to container stdout for `docker logs`
+    logger: {
+      // Minimal Pino-compatible logger to suppress verbose Baileys output
+      level: 'silent',
+      child: function() { return this; },
+      debug: function() {},
+      info: function() {},
+      warn: function() {},
+      error: function() {},
+      fatal: function() {},
+      trace: function() {},
+      silent: function() {}
+    },
     auth: state,
     browser: Browsers.ubuntu('Chrome'), // mimic a real Ubuntu + Chrome pairing
     generateHighQualityLinkPreview: false,
